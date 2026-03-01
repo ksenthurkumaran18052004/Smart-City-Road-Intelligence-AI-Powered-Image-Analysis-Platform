@@ -1,0 +1,10 @@
+{
+  "build": {
+    "builder": "BUILDPACKS",
+    "buildpacks": [
+      {
+        "id": "heroku/python"
+      }
+    ]
+  }
+}
