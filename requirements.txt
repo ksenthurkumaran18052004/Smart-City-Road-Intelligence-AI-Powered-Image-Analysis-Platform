@@ -1,10 +1,10 @@
-fastapi==0.104.1
-uvicorn==0.24.0
+fastapi==0.109.0
+uvicorn==0.27.0
 torch>=2.2.0
 torchvision>=0.17.0
-ultralytics==8.0.213
-opencv-python==4.8.1.78
+ultralytics==8.1.0
+opencv-python==4.9.0.80
 pytesseract==0.3.10
-numpy==1.24.3
+numpy>=1.24.0
 python-multipart==0.0.6
 python-dotenv==1.0.0
