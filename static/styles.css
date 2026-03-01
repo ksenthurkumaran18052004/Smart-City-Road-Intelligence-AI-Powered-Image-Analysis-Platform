@@ -1,0 +1,264 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+    padding: 40px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.upload-section {
+    margin-bottom: 30px;
+}
+
+.upload-zone {
+    border: 2px dashed #667eea;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9ff;
+}
+
+.upload-zone:hover {
+    background: #eef2ff;
+    border-color: #764ba2;
+}
+
+.upload-zone.dragover {
+    background: #e8ecff;
+    border-color: #764ba2;
+    transform: scale(1.02);
+}
+
+.upload-zone svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 15px;
+    color: #667eea;
+}
+
+.upload-zone p {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.upload-zone .small {
+    color: #999;
+    font-size: 14px;
+}
+
+#videoInput {
+    display: none;
+}
+
+.file-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f0f4ff;
+    border-radius: 6px;
+    display: none;
+}
+
+.file-info.active {
+    display: block;
+}
+
+.file-info p {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.file-info .filename {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-upload:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-clear {
+    background: #e8ecff;
+    color: #667eea;
+}
+
+.btn-clear:hover {
+    background: #dbe2ff;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    display: none;
+    text-align: center;
+}
+
+.status.active {
+    display: block;
+}
+
+.status.loading {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status.success {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.status.error {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    width: 0%;
+    animation: loading 2s infinite;
+}
+
+@keyframes loading {
+    0% { width: 0%; }
+    50% { width: 75%; }
+    100% { width: 100%; }
+}
+
+.help-text {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.help-text h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.help-text ul {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.help-text li {
+    margin-bottom: 5px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 25px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .upload-zone {
+        padding: 30px 15px;
+    }
+
+    .upload-zone svg {
+        width: 40px;
+        height: 40px;
+    }
+}

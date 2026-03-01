@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Smart City Road Intelligence</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .results-container {
+            max-width: 900px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-info h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .video-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn-back {
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: #dbe2ff;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .card-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .accident-high {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .accident-high .card-value {
+            color: #ff6b6b;
+        }
+
+        .accident-low {
+            border-left: 4px solid #51cf66;
+        }
+
+        .accident-low .card-value {
+            color: #51cf66;
+        }
+
+        .helmet-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .helmet-stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .helmet-stat .number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .helmet-stat .label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .plates-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+        }
+
+        .plates-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .plate-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .plate-item {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .plate-text {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .plate-conf {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .no-plates {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        @media (max-width: 600px) {
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .helmet-info {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container results-container">
+        <div class="results-header">
+            <div class="video-info">
+                <h2 id="videoFileName">Analysis Results</h2>
+                <p id="analysisTime">Analyzed: --</p>
+            </div>
+            <a href="/" class="btn-back">← Back to Upload</a>
+        </div>
+
+        <div id="loadingState" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading results...</p>
+        </div>
+
+        <div id="errorState" style="display: none;">
+            <div class="error-message" id="errorMessage"></div>
+            <button class="btn-primary" onclick="window.location.href='/'">Back to Upload</button>
+        </div>
+
+        <div id="resultsState" style="display: none;">
+            <!-- Accident Detection Card -->
+            <div class="results-grid">
+                <div class="result-card" id="accidentCard">
+                    <div class="card-icon">🚨</div>
+                    <div class="card-label">Accident Detection</div>
+                    <div class="card-value" id="accidentStatus">--</div>
+                    <div class="card-subtitle" id="accidentConfidence">Confidence: --%</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="accidentBar"></div>
+                    </div>
+                </div>
+
+                <!-- Helmet Violations Card -->
+                <div class="result-card">
+                    <div class="card-icon">🪖</div>
+                    <div class="card-label">Helmet Status</div>
+                    <div class="helmet-info">
+                        <div class="helmet-stat">
+                            <span class="number" id="withHelmet">-</span>
+                            <span class="label">With Helmet</span>
+                        </div>
+                        <div style="width: 1px; background: #ddd;"></div>
+                        <div class="helmet-stat">
+                            <span class="number" style="color: #ff6b6b;" id="withoutHelmet">-</span>
+                            <span class="label">Without Helmet</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pothole Detection Card -->
+                <div class="result-card">
+                    <div class="card-icon">🕳️</div>
+                    <div class="card-label">Potholes Detected</div>
+                    <div class="card-value" id="potholeCount">0</div>
+                    <div class="card-subtitle">Total detections</div>
+                </div>
+            </div>
+
+            <!-- License Plates Section -->
+            <div class="plates-section">
+                <h3>🚔 Detected License Plates</h3>
+                <div class="plate-list" id="platesList">
+                    <div class="no-plates">No license plates detected</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="window.location.href='/'">Analyze Another Image</button>
+                <button class="btn-secondary" onclick="downloadResults()">Download Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const resultsState = document.getElementById('resultsState');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadResults();
+        });
+
+        function loadResults() {
+            try {
+                const results = sessionStorage.getItem('analysisResults');
+                
+                if (!results) {
+                    showError('No analysis results found. Please upload a video first.');
+                    return;
+                }
+
+                const data = JSON.parse(results);
+                displayResults(data);
+                
+                // Clear results from storage
+                sessionStorage.removeItem('analysisResults');
+            } catch (error) {
+                showError(`Error loading results: ${error.message}`);
+            }
+        }
+
+        function displayResults(data) {
+            // Image info
+            if (data.filename) {
+                document.getElementById('videoFileName').textContent = data.filename;
+                document.getElementById('analysisTime').textContent = `Analyzed: ${new Date(data.timestamp).toLocaleString()}`;
+            }
+
+            // Accident Detection
+            const accidentStatus = data.accident_detected ? 'ACCIDENT DETECTED' : 'NO ACCIDENT';
+            const accidentColor = data.accident_detected ? 'accident-high' : 'accident-low';
+            document.getElementById('accidentCard').classList.add(accidentColor);
+            document.getElementById('accidentStatus').textContent = accidentStatus;
+            
+            const accidentConf = (data.accident_confidence * 100).toFixed(1);
+            document.getElementById('accidentConfidence').textContent = `Confidence: ${accidentConf}%`;
+            document.getElementById('accidentBar').style.width = `${accidentConf}%`;
+
+            // Helmet Violations
+            document.getElementById('withHelmet').textContent = data.helmet_violations.with_helmet;
+            document.getElementById('withoutHelmet').textContent = data.helmet_violations.without_helmet;
+
+            // Potholes
+            document.getElementById('potholeCount').textContent = data.potholes_detected;
+
+            // License Plates
+            const platesList = document.getElementById('platesList');
+            if (data.detected_plates && data.detected_plates.length > 0) {
+                // Convert plates object to array if needed
+                const plates = Array.isArray(data.detected_plates) ? data.detected_plates : 
+                               Object.values(data.detected_plates);
+                
+                if (plates.length > 0) {
+                    platesList.innerHTML = '';
+                    plates.forEach((plate, index) => {
+                        // Handle different plate object structures
+                        const plateText = plate.plate_text || plate || '';
+                        const confidence = plate.confidence ? (plate.confidence * 100).toFixed(1) : '0';
+                        
+                        if (plateText) {
+                            const plateEl = document.createElement('div');
+                            plateEl.className = 'plate-item';
+                            plateEl.innerHTML = `
+                                <span class="plate-text">${plateText}</span>
+                                <span class="plate-conf">${confidence}%</span>
+                            `;
+                            platesList.appendChild(plateEl);
+                        }
+                    });
+                }
+            }
+
+            // Show results
+            loadingState.style.display = 'none';
+            resultsState.style.display = 'block';
+
+            // Store for download
+            window.analysisResults = data;
+        }
+
+        function showError(message) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function downloadResults() {
+            if (!window.analysisResults) {
+                alert('No results to download');
+                return;
+            }
+
+            const data = JSON.stringify(window.analysisResults, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analysis_results_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Road Intelligence - Image Analysis</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            font-weight: 300;
+            opacity: 0.95;
+            margin-bottom: 30px;
+        }
+
+        .features-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .feature-badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-badge:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        .upload-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(102,126,234,0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #eef2ff 0%, #e8ecff 100%);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.2);
+        }
+
+        .upload-zone.dragover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #e8ecff 0%, #dbe2ff 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .upload-text {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .file-info.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .file-info p {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .filename {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 160px;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102,126,234,0.4);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-clear {
+            background: #f0f4ff;
+            color: #667eea;
+            border: 2px solid #dbe2ff;
+        }
+
+        .btn-clear:hover {
+            background: #e8ecff;
+            border-color: #667eea;
+        }
+
+        .status {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            animation: loading 2s infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 75%; }
+            100% { width: 100%; }
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #eee;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .detail-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .detail-text {
+            color: #999;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .upload-container {
+                padding: 30px 20px;
+            }
+
+            .upload-zone {
+                padding: 40px 15px;
+            }
+
+            .features-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">🛣️ Smart City Road Intelligence</h1>
+            <p class="hero-subtitle">AI-Powered Image Analysis Platform</p>
+            <div class="features-row">
+                <div class="feature-badge">🚨 Accident Detection</div>
+                <div class="feature-badge">🪖 Helmet Violations</div>
+                <div class="feature-badge">🚔 License Plates</div>
+                <div class="feature-badge">🕳️ Pothole Detection</div>
+            </div>
+        </div>
+
+        <div class="upload-container">
+            <h2 class="section-title">Upload an Image</h2>
+
+            <label for="imageInput" class="upload-zone" id="uploadZone">
+                <span class="upload-icon">📸</span>
+                <p class="upload-text">Drag and drop your image here</p>
+                <p class="upload-subtext">or click to select a file</p>
+                <p class="upload-subtext">JPG, PNG, BMP, GIF, WebP (Max 50MB)</p>
+            </label>
+            <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.bmp,.gif,.webp" />
+
+            <div class="file-info" id="fileInfo">
+                <p>📁 Selected: <span class="filename" id="fileName"></span></p>
+                <p>📊 Size: <span id="fileSize"></span></p>
+            </div>
+
+            <div class="status" id="status">
+                <span class="spinner"></span>
+                <span id="statusText">Processing your image...</span>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-upload" id="uploadBtn" disabled>Upload & Analyze</button>
+                <button class="btn btn-clear" id="clearBtn">Clear</button>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="detail-icon">⚡</div>
+                    <div class="detail-title">Instant Results</div>
+                    <div class="detail-text">Get analysis in seconds</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">🎯</div>
+                    <div class="detail-title">High Accuracy</div>
+                    <div class="detail-text">State-of-the-art AI models</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">🔒</div>
+                    <div class="detail-title">Secure Upload</div>
+                    <div class="detail-text">Files deleted after analysis</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">📊</div>
+                    <div class="detail-title">Detailed Report</div>
+                    <div class="detail-text">Comprehensive analysis data</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('imageInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+
+        const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'];
+        const MAX_SIZE = 50 * 1024 * 1024; // 50 MB
+
+        let selectedFile = null;
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                processFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length) {
+                processFile(fileInput.files[0]);
+            }
+        });
+
+        function processFile(file) {
+            if (!file) {
+                fileInfo.classList.remove('active');
+                uploadBtn.disabled = true;
+                selectedFile = null;
+                return;
+            }
+
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!ALLOWED_EXTENSIONS.includes(ext)) {
+                showStatus(`Invalid format. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`, 'error');
+                fileInput.value = '';
+                uploadBtn.disabled = true;
+                selectedFile = null;
+                return;
+            }
+
+            if (file.size > MAX_SIZE) {
+                showStatus(`File too large. Max size: ${(MAX_SIZE / (1024*1024)).toFixed(0)} MB`, 'error');
+                fileInput.value = '';
+                uploadBtn.disabled = true;
+                selectedFile = null;
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / (1024*1024)).toFixed(2) + ' MB';
+            fileInfo.classList.add('active');
+            uploadBtn.disabled = false;
+            status.classList.remove('active');
+        }
+
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            uploadBtn.disabled = true;
+            showStatus('Processing your image...', 'loading');
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Upload failed');
+                }
+
+                const results = await response.json();
+                sessionStorage.setItem('analysisResults', JSON.stringify(results));
+                window.location.href = '/results';
+
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+                uploadBtn.disabled = false;
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            fileInfo.classList.remove('active');
+            status.classList.remove('active');
+            uploadBtn.disabled = true;
+            selectedFile = null;
+        });
+
+        function showStatus(message, type) {
+            statusText.textContent = message;
+            status.className = 'status active ' + type;
+        }
+    </script>
+</body>
+</html>
