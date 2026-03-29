@@ -21,4 +21,4 @@ COPY . /app
 
 EXPOSE 8000
 
-CMD ["python", "-c", "import os,uvicorn; uvicorn.run('app.main:app', host='0.0.0.0', port=int(os.getenv('PORT','8000')))"]
+ENTRYPOINT ["python", "-c", "import os,uvicorn; p=os.getenv('PORT','8000'); port=int(p) if str(p).isdigit() else 8000; uvicorn.run('app.main:app', host='0.0.0.0', port=port)" ]
