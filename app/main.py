@@ -6,7 +6,7 @@ import shutil
 import json
 from datetime import datetime
 
-from app.config import UPLOAD_DIR, ALLOWED_IMAGE_EXTENSIONS, MAX_UPLOAD_SIZE, API_TITLE, API_VERSION
+from app.config import UPLOAD_DIR, ALLOWED_IMAGE_EXTENSIONS, MAX_UPLOAD_SIZE, API_TITLE, API_VERSION, DEVICE
 from app.image_processor import ImageAnalyzer, validate_image_file
 
 # Initialize FastAPI app
@@ -130,7 +130,7 @@ async def health_check():
     return {
         "status": "healthy",
         "models_loaded": True,
-        "device": "cuda" if image_analyzer.model_loader._loaded else "cpu"
+        "device": DEVICE
     }
 
 
