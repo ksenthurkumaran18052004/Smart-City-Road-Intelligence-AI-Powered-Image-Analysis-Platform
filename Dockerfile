@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && pip install -r /app/requirements.txt
+COPY sitecustomize.py /usr/local/lib/python3.11/site-packages/sitecustomize.py
 
 COPY . /app
 
