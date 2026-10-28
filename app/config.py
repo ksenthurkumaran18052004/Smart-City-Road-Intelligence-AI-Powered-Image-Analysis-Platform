@@ -37,6 +37,16 @@ UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB for images
 ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'}
+MAX_VIDEO_UPLOAD_SIZE = 500 * 1024 * 1024
+ALLOWED_VIDEO_EXTENSIONS = {'.mp4', '.avi', '.mov', '.mkv', '.webm', '.mpeg', '.mpg'}
+
+# Video processing
+FRAME_SAMPLING_INTERVAL = 0.5
+ACCIDENT_THRESHOLD = 0.7
+HELMET_CONFIDENCE = 0.25
+LICENSE_PLATE_CONFIDENCE = 0.15
+DETECTION_IMAGE_SIZE = 1280
+VEHICLE_MODEL_NAME = "yolov8n.pt"
 
 # Image processing
 IMAGE_RESIZE = (640, 480)  # Resize images for processing

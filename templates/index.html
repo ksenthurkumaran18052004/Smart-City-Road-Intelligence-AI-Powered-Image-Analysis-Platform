@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart City Road Intelligence - Image Analysis</title>
+    <title>Smart City Road Intelligence - Video Analysis</title>
     <link rel="stylesheet" href="/static/styles.css">
     <style>
         body {
@@ -376,7 +376,7 @@
     <div class="main-container">
         <div class="hero-section">
             <h1 class="hero-title">🛣️ Smart City Road Intelligence</h1>
-            <p class="hero-subtitle">AI-Powered Image Analysis Platform</p>
+            <p class="hero-subtitle">AI-Powered Road Video Analysis Platform</p>
             <div class="features-row">
                 <div class="feature-badge">🚨 Accident Detection</div>
                 <div class="feature-badge">🪖 Helmet Violations</div>
@@ -386,15 +386,15 @@
         </div>
 
         <div class="upload-container">
-            <h2 class="section-title">Upload an Image</h2>
+            <h2 class="section-title">Upload a Road Video</h2>
 
             <label for="imageInput" class="upload-zone" id="uploadZone">
-                <span class="upload-icon">📸</span>
-                <p class="upload-text">Drag and drop your image here</p>
+                <span class="upload-icon">🎥</span>
+                <p class="upload-text">Drag and drop your video here</p>
                 <p class="upload-subtext">or click to select a file</p>
-                <p class="upload-subtext">JPG, PNG, BMP, GIF, WebP (Max 50MB)</p>
+                <p class="upload-subtext">MP4, AVI, MOV, MKV, WebM (Max 500MB)</p>
             </label>
-            <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.bmp,.gif,.webp" />
+            <input type="file" id="imageInput" accept=".mp4,.avi,.mov,.mkv,.webm,.mpeg,.mpg" />
 
             <div class="file-info" id="fileInfo">
                 <p>📁 Selected: <span class="filename" id="fileName"></span></p>
@@ -403,7 +403,7 @@
 
             <div class="status" id="status">
                 <span class="spinner"></span>
-                <span id="statusText">Processing your image...</span>
+                <span id="statusText">Processing your video...</span>
                 <div class="progress-bar">
                     <div class="progress"></div>
                 </div>
@@ -450,8 +450,8 @@
         const status = document.getElementById('status');
         const statusText = document.getElementById('statusText');
 
-        const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'];
-        const MAX_SIZE = 50 * 1024 * 1024; // 50 MB
+        const ALLOWED_EXTENSIONS = ['.mp4', '.avi', '.mov', '.mkv', '.webm', '.mpeg', '.mpg'];
+        const MAX_SIZE = 500 * 1024 * 1024; // 500 MB
 
         let selectedFile = null;
 
@@ -517,13 +517,13 @@
             if (!selectedFile) return;
 
             uploadBtn.disabled = true;
-            showStatus('Processing your image...', 'loading');
+            showStatus('Processing all four models on sampled video frames...', 'loading');
 
             const formData = new FormData();
             formData.append('file', selectedFile);
 
             try {
-                const response = await fetch('/upload-image', {
+                const response = await fetch('/upload-video', {
                     method: 'POST',
                     body: formData
                 });

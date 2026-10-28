@@ -293,6 +293,21 @@
             margin-bottom: 20px;
             border-left: 4px solid #c62828;
         }
+
+        .frame-events {
+            margin-top: 25px;
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 12px;
+        }
+
+        .frame-event {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+        }
+
+        .frame-event:last-child { border-bottom: 0; }
     </style>
 </head>
 <body>
@@ -335,12 +350,12 @@
                     <div class="helmet-info">
                         <div class="helmet-stat">
                             <span class="number" id="withHelmet">-</span>
-                            <span class="label">With Helmet</span>
+                            <span class="label">Unique riders with helmet</span>
                         </div>
                         <div style="width: 1px; background: #ddd;"></div>
                         <div class="helmet-stat">
                             <span class="number" style="color: #ff6b6b;" id="withoutHelmet">-</span>
-                            <span class="label">Without Helmet</span>
+                            <span class="label">Unique riders without helmet</span>
                         </div>
                     </div>
                 </div>
@@ -362,9 +377,14 @@
                 </div>
             </div>
 
+            <div class="frame-events" id="warningsSection" style="display: none;">
+                <h3>Analysis Warnings</h3>
+                <div id="warningsList"></div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="btn-primary" onclick="window.location.href='/'">Analyze Another Image</button>
+                <button class="btn-primary" onclick="window.location.href='/'">Analyze Another Video</button>
                 <button class="btn-secondary" onclick="downloadResults()">Download Results</button>
             </div>
         </div>
@@ -399,7 +419,7 @@
         }
 
         function displayResults(data) {
-            // Image info
+            // Video info
             if (data.filename) {
                 document.getElementById('videoFileName').textContent = data.filename;
                 document.getElementById('analysisTime').textContent = `Analyzed: ${new Date(data.timestamp).toLocaleString()}`;
@@ -433,20 +453,35 @@
                     platesList.innerHTML = '';
                     plates.forEach((plate, index) => {
                         // Handle different plate object structures
-                        const plateText = plate.plate_text || plate || '';
+                        const plateText = plate.plate_text || 'Plate detected; text unreadable';
                         const confidence = plate.confidence ? (plate.confidence * 100).toFixed(1) : '0';
                         
                         if (plateText) {
                             const plateEl = document.createElement('div');
                             plateEl.className = 'plate-item';
-                            plateEl.innerHTML = `
-                                <span class="plate-text">${plateText}</span>
-                                <span class="plate-conf">${confidence}%</span>
-                            `;
+                            const textEl = document.createElement('span');
+                            textEl.className = 'plate-text';
+                            textEl.textContent = plateText;
+                            const confidenceEl = document.createElement('span');
+                            confidenceEl.className = 'plate-conf';
+                            confidenceEl.textContent = `${confidence}%`;
+                            plateEl.append(textEl, confidenceEl);
                             platesList.appendChild(plateEl);
                         }
                     });
                 }
+            }
+
+            const warnings = data.analysis_warnings || [];
+            if (warnings.length) {
+                const warningsSection = document.getElementById('warningsSection');
+                const warningsList = document.getElementById('warningsList');
+                warningsSection.style.display = 'block';
+                warnings.forEach((warning) => {
+                    const warningEl = document.createElement('p');
+                    warningEl.textContent = warning;
+                    warningsList.appendChild(warningEl);
+                });
             }
 
             // Show results

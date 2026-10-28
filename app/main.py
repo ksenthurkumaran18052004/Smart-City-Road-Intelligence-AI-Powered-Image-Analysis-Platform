@@ -6,8 +6,13 @@ import shutil
 import json
 from datetime import datetime
 
-from app.config import UPLOAD_DIR, ALLOWED_IMAGE_EXTENSIONS, MAX_UPLOAD_SIZE, API_TITLE, API_VERSION, DEVICE
+from app.config import (
+    UPLOAD_DIR, ALLOWED_IMAGE_EXTENSIONS, MAX_UPLOAD_SIZE,
+    MAX_VIDEO_UPLOAD_SIZE, ALLOWED_VIDEO_EXTENSIONS,
+    API_TITLE, API_VERSION, DEVICE
+)
 from app.image_processor import ImageAnalyzer, validate_image_file
+from app.video_processor import VideoAnalyzer, validate_video_file
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -22,6 +27,7 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Initialize image analyzer (loads models once at startup)
 image_analyzer = ImageAnalyzer()
+video_analyzer = VideoAnalyzer()
 
 # Template directory
 TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
@@ -110,6 +116,40 @@ async def upload_image(file: UploadFile = File(...)):
                 pass
 
 
+@app.post("/upload-video")
+async def upload_video(file: UploadFile = File(...)):
+    """Upload one video and run all four detectors on sampled frames."""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in ALLOWED_VIDEO_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Invalid video format")
+
+    safe_name = Path(file.filename).name
+    temp_file_path = UPLOAD_DIR / f"temp_video_{datetime.now().timestamp()}_{safe_name}"
+    try:
+        content = await file.read()
+        if len(content) > MAX_VIDEO_UPLOAD_SIZE:
+            raise HTTPException(status_code=413, detail="Video is larger than the 500 MB limit")
+        temp_file_path.write_bytes(content)
+        if not validate_video_file(temp_file_path):
+            raise HTTPException(status_code=400, detail="Invalid or corrupted video file")
+
+        results = video_analyzer.analyze_video(temp_file_path)
+        results['filename'] = file.filename
+        results['timestamp'] = datetime.now().isoformat()
+        return JSONResponse(content=results)
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error analyzing video: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Video analysis failed: {str(e)}")
+    finally:
+        if temp_file_path.exists():
+            temp_file_path.unlink(missing_ok=True)
+
+
 @app.get("/results", response_class=HTMLResponse)
 async def get_results_page():
     """
@@ -127,9 +167,14 @@ async def health_check():
     """
     Health check endpoint
     """
+    models = {
+        name: model is not None
+        for name, model in video_analyzer.model_loader.get_all_models().items()
+    }
     return {
-        "status": "healthy",
-        "models_loaded": True,
+        "status": "healthy" if all(models.values()) else "degraded",
+        "models_loaded": all(models.values()),
+        "models": models,
         "device": DEVICE
     }
 
@@ -141,7 +186,7 @@ if __name__ == "__main__":
     print(f"{API_TITLE} v{API_VERSION}")
     print("=" * 60)
     print("\nStarting server on http://localhost:8000")
-    print("Upload endpoint: POST /upload-image")
+    print("Upload endpoints: POST /upload-image and POST /upload-video")
     print("UI endpoint: GET /")
     print("\n" + "=" * 60)
     

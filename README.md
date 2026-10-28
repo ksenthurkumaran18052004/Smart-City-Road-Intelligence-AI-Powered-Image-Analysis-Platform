@@ -9,7 +9,7 @@ Complete AI-powered backend and frontend for automatic video analysis with multi
 - **🚔 License Plate Recognition**: Detects and recognizes license plates using YOLO + OCR
 - **🕳️ Pothole Detection**: Counts pothole detections in video
 - **📊 Clean Dashboard**: Modern responsive web UI for results display
-- **⚡ Production-Ready**: Modular, scalable architecture with proper error handling
+- **⚡ Multi-model video analysis**: Runs the detectors on sampled frames and preserves frame-level helmet and plate coordinates
 
 ## Project Structure
 
@@ -84,7 +84,7 @@ smart_city_ai/
 python -m app.main
 ```
 
-The server will start on `http://localhost:8000`
+The server will start on `http://localhost:8000`. The main workflow is video upload; the health endpoint reports which model artifacts loaded.
 
 ### Access the web interface:
 
@@ -144,11 +144,19 @@ Health check endpoint
 
 ```json
 {
-  "status": "healthy",
-  "models_loaded": true,
+   "status": "degraded",
+   "models_loaded": false,
+   "models": {
+      "accident": false,
+      "helmet": true,
+      "license_plate": true,
+      "pothole": true
+   },
   "device": "cuda"
 }
 ```
+
+The video response also includes `frames_analyzed` and `frame_events`. Each frame event contains the accident result, helmet boxes, recognized plates with boxes, and pothole count. The current model set has no vehicle detector or tracker, so permanent vehicle IDs and guaranteed helmet-to-plate matching require an additional vehicle/tracking model.
 
 ## Configuration
 
@@ -171,6 +179,8 @@ Edit `app/config.py` to customize:
 - Runs classification on sampled frames
 - If >70% (configurable) frames predict accident → classified as "Accident"
 - Returns confidence score (0-1)
+
+The checked-in accident file is an ONNX-to-PyTorch state dictionary without the exported model graph, so it cannot be executed by the application. Replace it with an executable YOLO classification checkpoint or export the original MobileNet model together with its graph before relying on accident results.
 
 ### Helmet Detection
 - Detects riders in each frame
